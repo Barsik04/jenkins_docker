@@ -11,5 +11,26 @@ services:
         - "50000:50000"
       container_name: "jenkins"
       volumes:
-        - /home/${myname}/jenkins_compose/jenkins_configuration:/var/jenkins_home
+        - /home/jenkins_compose/jenkins_configuration:/var/jenkins_home
         - /var/run/docker.sock:/var/run/docker.sock
+    
+    webserver:
+      image: nginx:latest
+      container_name: webserver
+      restart: always
+      tty: true
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - ./site/www:/var/www
+        - ./nginx/conf/:/etc/nginx/conf.d/:ro
+        - ./certbot/www:/var/www/certbot/:ro
+        - ./certbot/conf/:/etc/nginx/ssl/:ro
+
+
+    certbot:
+      image: certbot/certbot:latest
+      volumes:
+        - ./certbot/www/:/var/www/certbot/:rw
+        - ./certbot/conf/:/etc/letsencrypt/:rw
